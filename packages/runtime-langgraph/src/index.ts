@@ -394,7 +394,7 @@ interface CompiledGraph extends ProtocolCapableGraph {
   getState(config: Record<string, unknown>): Promise<StateSnapshot>;
   getStateHistory(
     config: Record<string, unknown>,
-    options?: { limit?: number; before?: Record<string, unknown> },
+    options?: { limit?: number; before?: { configurable?: { checkpoint_id?: string } } },
   ): AsyncIterable<StateSnapshot>;
   updateState(
     config: Record<string, unknown>,

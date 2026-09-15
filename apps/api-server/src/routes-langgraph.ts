@@ -78,10 +78,12 @@ export function langGraphRoutes(host: AgentHost): Hono {
 }
 
 const DEFAULT_HISTORY_LIMIT = 10;
-// The checkpoint saver interpolates the limit straight into `LIMIT ?`, so an
-// unvalidated one recreates the unbounded scan (`1e309` even yields `LIMIT NaN`).
 const MAX_HISTORY_LIMIT = 100;
 
+// The saver interpolates the limit into the SQL text and omits `LIMIT` entirely
+// for a falsy one, so anything outside `[1, MAX]` recreates the unbounded scan:
+// `0` drops the clause, `1e309` yields `LIMIT NaN`, and `1e21` stringifies
+// through the saver's `parseInt` to `1`.
 function resolveHistoryLimit(requested: unknown): number {
   if (typeof requested !== "number" || !Number.isFinite(requested) || requested < 1) {
     return DEFAULT_HISTORY_LIMIT;

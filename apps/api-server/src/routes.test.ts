@@ -79,9 +79,9 @@ function fakeHost(
           { threadId, checkpointId: "chk1", values: {}, next: [], createdAt: "t0" },
         ];
         const cursor = options?.beforeCheckpointId;
-        const after = cursor == null
-          ? page
-          : page.slice(page.findIndex((s) => s.checkpointId === cursor) + 1);
+        // Compares like the checkpointer's `checkpoint_id < ?` rather than locating
+        // the cursor row, so a cursor outside the page behaves as it does in SQL.
+        const after = cursor == null ? page : page.filter((s) => s.checkpointId < cursor);
         yield* options?.limit == null ? after : after.slice(0, options.limit);
       },
       async updateState(threadId: string) {
@@ -653,6 +653,28 @@ describe("api-server: checkpoint-shaped state surface", () => {
     });
     const list = (await res.json()) as Array<{ checkpoint_id: string }>;
     expect(list.map((s) => s.checkpoint_id)).toEqual(["chk1"]);
+  });
+
+  // Resolving the cursor in SQL rather than by locating its row is deliberately
+  // more useful than the equality scan it replaces, which returned nothing here.
+  it("POST /threads/:id/history returns earlier rows for a cursor absent from the page", async () => {
+    const res = await buildApp(fakeHost()).request("/threads/t1/history", {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ limit: 10, before: { configurable: { checkpoint_id: "chk15" } } }),
+    });
+    const list = (await res.json()) as Array<{ checkpoint_id: string }>;
+    expect(list.map((s) => s.checkpoint_id)).toEqual(["chk1"]);
+  });
+
+  it("POST /threads/:id/history returns a full page for a cursor newer than every row", async () => {
+    const res = await buildApp(fakeHost()).request("/threads/t1/history", {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ limit: 10, before: { configurable: { checkpoint_id: "chk3" } } }),
+    });
+    const list = (await res.json()) as Array<{ checkpoint_id: string }>;
+    expect(list.map((s) => s.checkpoint_id)).toEqual(["chk2", "chk1"]);
   });
 
   it("POST /threads/:id/history forwards the SDK's second-page cursor with the limit", async () => {
