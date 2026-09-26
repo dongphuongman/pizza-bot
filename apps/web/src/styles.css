@@ -305,6 +305,7 @@ button.sidebar-folder-row:hover,
   padding: 18px; box-shadow: 0 12px 40px rgba(0, 0, 0, .4);
   outline: none;
 }
+.sidebar-modal--wide { width: min(560px, calc(100vw - 32px)); }
 .sidebar-modal-title { font-size: 15px; font-weight: 700; margin-bottom: 8px; }
 .sidebar-modal-body { font-size: 13px; color: var(--dim); line-height: 1.5; }
 .sidebar-modal-error {
@@ -316,6 +317,17 @@ button.sidebar-folder-row:hover,
   background: var(--panel-2); color: var(--text); font: inherit;
 }
 .sidebar-modal-input:focus { outline: none; border-color: var(--brand); }
+.mcp-json-input { min-height: 220px; padding: 10px 12px; resize: vertical; line-height: 1.45; }
+.mcp-json-error {
+  display: grid; grid-template-columns: auto minmax(0, 1fr); align-items: start; gap: 10px;
+  margin-top: 12px; padding: 11px 12px; border-radius: 8px;
+  border: 1px solid color-mix(in srgb, var(--bad) 55%, var(--border));
+  background: color-mix(in srgb, var(--bad) 10%, var(--panel));
+  animation: toast-in .18s ease-out;
+}
+.mcp-json-error-icon { margin-top: 1px; color: var(--bad); }
+.mcp-json-error-title { font-size: 13px; font-weight: 700; }
+.mcp-json-error-text { margin-top: 2px; color: var(--dim); font-size: 12px; line-height: 1.4; word-break: break-word; }
 .sidebar-modal-actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 18px; }
 .sidebar-modal-btn {
   padding: 7px 14px; border: 1px solid var(--border); border-radius: 8px;
@@ -1081,9 +1093,11 @@ button.sidebar-folder-row:hover,
   pointer-events: auto; animation: toast-in .18s ease-out;
 }
 .app-toast.success { border-color: color-mix(in oklch, var(--ok) 45%, var(--border)); }
+.app-toast.warning { border-color: color-mix(in srgb, var(--warn) 55%, var(--border)); }
 .app-toast.error { border-color: color-mix(in oklch, var(--bad) 55%, var(--border)); }
 .app-toast-icon { margin-top: 1px; color: var(--info); }
 .app-toast.success .app-toast-icon { color: var(--ok); }
+.app-toast.warning .app-toast-icon { color: var(--warn); }
 .app-toast.error .app-toast-icon { color: var(--bad); }
 .app-toast-content { min-width: 0; }
 .app-toast-title { font-size: 13px; font-weight: 700; }
@@ -1731,6 +1745,7 @@ button.sidebar-folder-row:hover,
 .resource-editor { display: flex; flex-direction: column; gap: 0; max-width: 720px; }
 .resource-editor-head { margin-bottom: 8px; }
 .resource-editor-title { margin: 0; font-size: 17px; font-weight: 700; }
+.mcp-paste-json-btn { align-self: flex-start; }
 .resource-editor-body { display: flex; flex-direction: column; gap: 18px; padding: 12px 0; }
 .resource-editor-actions { display: flex; align-items: center; gap: 8px; padding-top: 16px; border-top: 1px solid var(--border); }
 .resource-editor-actions-spacer { flex: 1; }
